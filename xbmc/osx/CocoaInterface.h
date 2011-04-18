@@ -51,6 +51,7 @@ extern "C"
   // Application support
   //
   const char* Cocoa_GetIconFromBundle(const char *_bundlePath, const char *_iconName);
+  bool Cocoa_IsFilePackageAtPath(const char *_path);
   
   // Devices
   //

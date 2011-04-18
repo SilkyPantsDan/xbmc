@@ -263,6 +263,14 @@ const char* Cocoa_GetIconFromBundle(const char *_bundlePath, const char* _iconNa
   return [pngFile UTF8String];
 }
 
+bool Cocoa_IsFilePackageAtPath(const char *_path)
+{
+  if (Cocoa_GetOSVersion() >= 0x1066)
+    return [[NSWorkspace sharedWorkspace] isFilePackageAtPath:[NSString stringWithCString:_path]] == YES;
+  else
+    return false;
+}
+
 void Cocoa_MountPoint2DeviceName(char* path)
 {
   // if physical DVDs, libdvdnav wants "/dev/rdiskN" device name for OSX,

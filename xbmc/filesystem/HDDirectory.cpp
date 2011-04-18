@@ -33,6 +33,10 @@
 #include "utils/CharsetConverter.h"
 #endif
 
+#if defined (__APPLE__)
+#include "osx/CocoaInterface.h"
+#endif
+
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD) -1)
 #endif
@@ -113,7 +117,14 @@ bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items
 #else
         strLabel = wfd.cFileName;
 #endif
-        if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+        bool isDirectory = (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+        
+#if defined (__APPLE__)
+        CStdString fullPath = strRoot + strLabel;
+        isDirectory = isDirectory && !Cocoa_IsFilePackageAtPath(fullPath.c_str());
+#endif
+        
+        if ( isDirectory )
         {
           if (strLabel != "." && strLabel != "..")
           {

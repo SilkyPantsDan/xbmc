@@ -31,6 +31,11 @@
 #include "video/VideoInfoTag.h"
 #include "music/tags/MusicInfoTag.h"
 
+#if defined(__APPLE__)
+#include "utils/log.h"
+#include "osx/CocoaInterface.h"
+#endif
+
 
 using namespace MUSIC_INFO;
 using namespace Json;
@@ -187,7 +192,19 @@ bool CFileItemHandler::FillFileItemList(const Value &parameterObject, CFileItemL
     CStdString file = parameterObject["file"].asString();
     if (!file.empty())
     {
-      CFileItemPtr item = CFileItemPtr(new CFileItem(file, URIUtils::HasSlashAtEnd(file)));
+      bool isDirectory = URIUtils::HasSlashAtEnd(file);
+      
+#if defined (__APPLE__)
+      CLog::Log(LOGDEBUG, "Checking if %s is a package", file.c_str());
+      
+      if(Cocoa_IsFilePackageAtPath(file))
+      {
+        isDirectory = false;
+        URIUtils::RemoveSlashAtEnd(file);
+      }
+#endif
+      
+      CFileItemPtr item = CFileItemPtr(new CFileItem(file, isDirectory));
       list.Add(item);
     }
   }
