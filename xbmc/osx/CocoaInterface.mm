@@ -265,10 +265,37 @@ const char* Cocoa_GetIconFromBundle(const char *_bundlePath, const char* _iconNa
 
 bool Cocoa_IsFilePackageAtPath(const char *_path)
 {
-  if (Cocoa_GetOSVersion() >= 0x1066)
-    return [[NSWorkspace sharedWorkspace] isFilePackageAtPath:[NSString stringWithCString:_path]] == YES;
+  NSString* packagePath = [NSString stringWithCString:_path];
+  if (Cocoa_GetOSVersion() >= 0x1060)
+    return [[NSWorkspace sharedWorkspace] isFilePackageAtPath:[packagePath stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\""]]] == YES;
   else
     return false;
+}
+
+bool Cocoa_RunCommandLine(const char *_args, bool waitForExit)
+{
+  NSString* cmd = [NSString stringWithCString:_args];
+  NSRange loc = [cmd rangeOfString:@" "];
+  
+  NSString* prog = [cmd substringToIndex:loc.location];
+  NSString* args = [cmd substringFromIndex:loc.location];
+  
+  if(Cocoa_IsFilePackageAtPath([prog UTF8String]))
+  {
+    cmd = [NSString stringWithFormat:@"open %@ --args %@", prog, args];
+  }
+  
+  NSLog(@"Attempting to run %@", cmd);
+  
+  NSTask* task = [NSTask launchedTaskWithLaunchPath:@"/bin/sh" 
+                    arguments:[NSArray arrayWithObjects:@"-c", cmd, nil]];
+  
+  if(waitForExit)
+    [task waitUntilExit];
+  
+  NSLog(@"Returned: %@", [task terminationStatus]);
+  
+  return false;
 }
 
 void Cocoa_MountPoint2DeviceName(char* path)

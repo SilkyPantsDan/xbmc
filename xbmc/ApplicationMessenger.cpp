@@ -464,6 +464,8 @@ case TMSG_POWERDOWN:
     case TMSG_EXECUTE_OS:
 #if defined( _LINUX) && !defined(__APPLE__)
       CUtil::RunCommandLine(pMsg->strParam.c_str(), (pMsg->dwParam1 == 1));
+#elif defined(__APPLE__)
+      Cocoa_RunCommandLine(pMsg->strParam.c_str(), (pMsg->dwParam1 == 1));
 #elif defined(_WIN32)
       CWIN32Util::XBMCShellExecute(pMsg->strParam.c_str(), (pMsg->dwParam1 == 1));
 #endif
