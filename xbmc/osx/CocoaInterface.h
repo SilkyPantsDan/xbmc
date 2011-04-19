@@ -52,7 +52,7 @@ extern "C"
   //
   const char* Cocoa_GetIconFromBundle(const char *_bundlePath, const char *_iconName);
   bool Cocoa_IsFilePackageAtPath(const char *_path);
-  bool Cocoa_RunCommandLine(const char *_args, bool waitForExit);
+  bool Cocoa_RunCommandLine(const CStdString &_args, bool waitForExit);
   
   // Devices
   //

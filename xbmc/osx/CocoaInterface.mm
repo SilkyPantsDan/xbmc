@@ -271,29 +271,54 @@ bool Cocoa_IsFilePackageAtPath(const char *_path)
     return false;
 }
 
-bool Cocoa_RunCommandLine(const char *_args, bool waitForExit)
+bool Cocoa_RunCommandLine(const CStdString &_args, bool waitForExit)
 {
-  NSString* cmd = [NSString stringWithCString:_args];
-  NSRange loc = [cmd rangeOfString:@" "];
+  NSString *temp = [NSString stringWithCString:_args];
+  CStdString strCommand = _args;
+  CStdString strExe = _args;
+  CStdString strParams;
+  CStdString strWorkingDir;
   
-  NSString* prog = cmd;
-  NSString* args = @"";
-  
-  if(loc.length > 0)
+  strCommand.Trim();
+  if (strCommand.IsEmpty())
   {
-    prog = [cmd substringToIndex:loc.location];
-    args = [cmd substringFromIndex:loc.location];
+    return false;
+  }
+  int iIndex = -1;
+  char split = ' ';
+  if (strCommand[0] == '\"')
+  {
+    split = '\"';
+  }
+  iIndex = strCommand.Find(split, 1);
+  if (iIndex != -1)
+  {
+    strExe = strCommand.substr(0, iIndex + 1);
+    strParams = strCommand.substr(iIndex + 1);
   }
   
-  if(Cocoa_IsFilePackageAtPath([prog UTF8String]))
-  {
-    cmd = [NSString stringWithFormat:@"open %@ --args %@", prog, args];
-  }
+  strExe.Replace("\"","");
   
-  NSLog(@"Attempting to run %@", cmd);
+  strWorkingDir = strExe; 
+  iIndex = strWorkingDir.ReverseFind('\\'); 
+  if(iIndex != -1) 
+  { 
+    strWorkingDir[iIndex+1] = '\0'; 
+  } 
+
+  if(Cocoa_IsFilePackageAtPath(strExe))
+  {
+    strCommand = "open \"" + strExe + "\"";
+    
+    if(strParams.GetLength() > 0)
+      strCommand += " --args " + strParams;
+  }
+
+  
+  NSLog(@"Attempting to run %@", [NSString stringWithCString:strCommand]);
   
   NSTask* task = [NSTask launchedTaskWithLaunchPath:@"/bin/sh" 
-                    arguments:[NSArray arrayWithObjects:@"-c", cmd, nil]];
+                    arguments:[NSArray arrayWithObjects:@"-c", [NSString stringWithCString:strCommand], nil]];
   
   if(waitForExit)
     [task waitUntilExit];

@@ -242,7 +242,7 @@ bool CGUIWindowPrograms::OnPlayMedia(int iItem)
 
   if (pItem->m_bIsFolder) return false;
   
-  CBuiltins::Execute("System.ExecWait(\"" + pItem->m_strPath + "\")");
+  CBuiltins::Execute("System.ExecWait(\\\"" + pItem->m_strPath + "\\\")");
 
   return false;
 }
