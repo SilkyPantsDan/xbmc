@@ -276,8 +276,14 @@ bool Cocoa_RunCommandLine(const char *_args, bool waitForExit)
   NSString* cmd = [NSString stringWithCString:_args];
   NSRange loc = [cmd rangeOfString:@" "];
   
-  NSString* prog = [cmd substringToIndex:loc.location];
-  NSString* args = [cmd substringFromIndex:loc.location];
+  NSString* prog = cmd;
+  NSString* args = @"";
+  
+  if(loc.length > 0)
+  {
+    prog = [cmd substringToIndex:loc.location];
+    args = [cmd substringFromIndex:loc.location];
+  }
   
   if(Cocoa_IsFilePackageAtPath([prog UTF8String]))
   {
