@@ -39,6 +39,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "utils/TimeUtils.h"
 #include "utils/log.h"
+#include "interfaces/Builtins.h"
 
 using namespace XFILE;
 
@@ -240,6 +241,8 @@ bool CGUIWindowPrograms::OnPlayMedia(int iItem)
 #endif
 
   if (pItem->m_bIsFolder) return false;
+  
+  CBuiltins::Execute("System.ExecWait(\"" + pItem->m_strPath + "\")");
 
   return false;
 }

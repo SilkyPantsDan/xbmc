@@ -58,7 +58,13 @@ CStdString CGUIViewStateWindowPrograms::GetLockType()
 
 CStdString CGUIViewStateWindowPrograms::GetExtensions()
 {
+#if defined(_LINUX)
+  return "";
+#elif defined(_WIN32)
+  return ".exe|.lnk|.cmd|.bat";
+#else
   return ".xbe|.cut";
+#endif
 }
 
 VECSOURCES& CGUIViewStateWindowPrograms::GetSources()
